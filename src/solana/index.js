@@ -8,11 +8,15 @@ import {
 } from "@solana/web3.js";
 import { deserialize, serialize } from "borsh";
 
-const cluster = "https://api.devnet.solana.com"; //"http://localhost:8899"
+// 1. Defining all the connects, devnet, wallets, and program id
+
+const cluster = "http://localhost:8899"; //"https://api.devnet.solana.com";
 const connection = new Connection(cluster, "confirmed");
 const wallet = new Wallet("https://www.sollet.io", cluster);
+
+// Program Id is generated when Rust program has been deployed to the Solana cluster
 const programId = new PublicKey(
-  "CSa1vPt5SMDwvVpsvYAxshG2SjyXLh4pHZVqZCrcJsSk"
+  "2eYJoJypAjNMZ9DYKSvQG2iRa3GgPVfB59dSKRCef2d8"
 );
 
 export async function setPayerAndBlockhashTransaction(instructions) {
@@ -45,6 +49,12 @@ export async function signAndSendTransaction(transaction) {
   }
 }
 
+async function checkWallet() {
+  if (!wallet.connected) {
+    await wallet.connect();
+  }
+}
+
 class CampaignDetails {
   constructor(properties) {
     Object.keys(properties).forEach((key) => {
@@ -65,6 +75,21 @@ class CampaignDetails {
         ]
       }]
   ]);
+}
+
+class WithdrawRequest {
+  constructor(properties) {
+    Object.keys(properties).forEach((key) => {
+      this[key] = properties[key];
+    });
+  }
+  static schema = new Map([[WithdrawRequest,
+    {
+      kind: 'struct',
+      fields: [
+        ['amount', 'u64'],
+      ]
+    }]]);
 }
 
 export async function createCampaign(name, description, image_link) {
@@ -117,12 +142,6 @@ export async function createCampaign(name, description, image_link) {
   const signature = await signAndSendTransaction(trans);
   const result = await connection.confirmTransaction(signature);
   console.log("end sendMessage", result);
-}
-
-async function checkWallet() {
-  if (!wallet.connected) {
-    await wallet.connect();
-  }
 }
 
 export async function getAllCampaigns() {
@@ -184,21 +203,6 @@ export async function donateToCampaign(
   const signature = await signAndSendTransaction(trans);
   const result = await connection.confirmTransaction(signature);
   console.log("end sendMessage", result);
-}
-
-class WithdrawRequest {
-  constructor(properties) {
-    Object.keys(properties).forEach((key) => {
-      this[key] = properties[key];
-    });
-  }
-  static schema = new Map([[WithdrawRequest,
-    {
-      kind: 'struct',
-      fields: [
-        ['amount', 'u64'],
-      ]
-    }]]);
 }
 
 export async function withdraw(

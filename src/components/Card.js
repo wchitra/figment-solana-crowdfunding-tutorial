@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { donateToCampaign, getAllCampaigns, withdraw } from "../solana";
+import { donateToCampaign, getAllCampaigns, withdraw } from "../solana/";
 
 const Card = ({ data, setCards }) => {
   const [amount, setAmount] = useState(0);
@@ -26,7 +26,7 @@ const Card = ({ data, setCards }) => {
     <div>
       <div className="ui card fluid">
         <div className="image">
-          <img src={data.image} />
+          <img src={data.image} alt="Campaign" />
         </div>
         <div className="content">
           <div className="header">{data.title}</div>

@@ -32,6 +32,7 @@ pub fn process_instruction(
     accounts: &[AccountInfo], // The account to say hello to
     instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
 ) -> ProgramResult {
+    //return create_campaign(program_id, accounts, instruction_data);
     if instruction_data.len() == 0 {
         return Err(ProgramError::InvalidInstructionData);
     }
@@ -53,11 +54,16 @@ fn create_campaign(
     accounts: &[AccountInfo],
     instruction_data: &[u8],
 ) -> ProgramResult {
+    msg!("enter create_campaign function");
+
     // We create a iterator on accounts
     // accounts parameter is the array of accounts related to this entrypoint
     let accounts_iter = &mut accounts.iter();
+    msg!("got account iterator");
     let writing_account = next_account_info(accounts_iter)?;
+    msg!("got writing account");
     let creator_account = next_account_info(accounts_iter)?;
+    msg!("got creator account");
 
     // Now to allow transactions we want the creator account to sign the transaction.
     if !creator_account.is_signer {
@@ -70,10 +76,13 @@ fn create_campaign(
         return Err(ProgramError::IncorrectProgramId);
     }
 
+    msg!("creating campaign... {:?}", instruction_data);
     // create the campaign
-    let mut input_data = CampaignDetails::try_from_slice(&instruction_data)
-        .expect("Instruction data serialization didn't worked");
+    let mut input_data =
+        CampaignDetails::try_from_slice(&instruction_data[1..instruction_data.len()])
+            .expect("Instruction data serialization didn't worked");
 
+    msg!("got campaign data...");
     // checking if the campaign was created by the right person
     if input_data.admin != *creator_account.key {
         msg!("Invaild instruction data");
@@ -122,7 +131,7 @@ fn withdraw(
         return Err(ProgramError::InvalidAccountData);
     }
 
-    let input_data = WithdrawRequest::try_from_slice(&instruction_data)
+    let input_data = WithdrawRequest::try_from_slice(&instruction_data[1..instruction_data.len()])
         .expect("Instruction data serialization didn't worked");
 
     let rent_exemption = Rent::get()?.minimum_balance(writing_account.data_len());
@@ -140,7 +149,11 @@ fn withdraw(
     Ok(())
 }
 
-fn donate(program_id: &Pubkey, accounts: &[AccountInfo], instruction_data: &[u8]) -> ProgramResult {
+fn donate(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    _instruction_data: &[u8],
+) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
     let writing_account = next_account_info(accounts_iter)?;
     let donator_program_account = next_account_info(accounts_iter)?;

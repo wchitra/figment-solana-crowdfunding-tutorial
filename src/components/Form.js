@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createCampaign } from "../solana";
+import { createCampaign } from "../solana/";
 const Form = ({ setRoute }) => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
