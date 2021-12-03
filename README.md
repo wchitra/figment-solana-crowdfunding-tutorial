@@ -1,70 +1,71 @@
-# Getting Started with Create React App
+# Solana Learnings
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was a tutorial from Figment, https://learn.figment.io/tutorials/crowdfunding-with-solana
 
-## Available Scripts
+## Launching the application
 
-In the project directory, you can run:
+Refer to https://docs.solana.com/cli to configure the Solana CLI & generate keypair
 
-### `yarn start`
+## Solana (Rust program side)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Local Testnet
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+1. Navigate to the Rust program directory.
+```bash
+cd program
+```
+2. Compile the program
+```bash
+cargo build-bpf --manifest-path=Cargo.toml --bpf-out-dir=dist/program
+```
+3. In a seperate terminal, start the local cluster
+```bash
+solana-test-validator
+```
+4. In another seperate terminal, listen to the logs
+```bash
+solana logs
+```
+5. Deploy the program
+```bash
+solana deploy --keypair <path_to_keypair_json> dist/program/program.so --url http://127.0.0.1:8899
+```
+6. After successful deployment, take the Program ID displayed in the terminal and set it as the program id for the front-end, `../src/solana/index.js`
+```bash
+const programId = new PublicKey(<program id>);
+```
 
-### `yarn test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## DEVNET
 
-### `yarn build`
+1. Execute steps 1, 2.
+2. Replace step 5 with
+```bash
+solana deploy --keypair <path_to_keypair_json> dist/program/program.so --url https://api.devnet.solana.com
+```
+3. Execute step 6.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Front-end
+1. Download dependencies
+```bash
+yarn
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Run local node server
+```bash
+yarn run
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `yarn eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+3. Have the Phantom wallet browser extension installed to sign transaction. Also, be sure to have it set the right cluster.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Debugging Lessons Learn
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+1. In the program, msg!() is my friend.
+2. When there is an error, the msg!() message can be seen in the browser terminal. Super helpful, since the messages won't display in the solana logs when there is a error (or a panic).
+3. In programs, serializing is like saving data... OK()
+4. Seems to be a lot of checking to see if the account owner is the program id
+5. Error messages are cryptic, so have to navigate to the source code to figure out what the actual error is.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
